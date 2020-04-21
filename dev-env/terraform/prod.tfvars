@@ -1,0 +1,5 @@
+prefix_name = "yama"
+system_name = "dev-env"
+author = "yamaguti-dxa"
+vpc_id = "vpc-04abf055a63457640"
+public_subnet_cide_block = "10.100.0.0/24"
