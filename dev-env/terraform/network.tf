@@ -8,7 +8,7 @@ resource "aws_internet_gateway" "gw" {
 
 resource "aws_subnet" "public" {
     vpc_id = var.vpc_id
-    cidr_block = var.public_subnet_cide_block
+    cidr_block = var.public_subnet_cidr_block
     map_public_ip_on_launch = true
     tags = {
         Name = "${var.prefix_name}-${var.system_name}-public"
