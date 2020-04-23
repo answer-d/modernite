@@ -3,7 +3,7 @@ variable "prefix_name" {
 }
 
 variable "system_name" {
-  description = "String to be inserted to the resource name"
+    description = "String to be inserted to the resource name"
 }
 
 variable "author" {
@@ -15,5 +15,9 @@ variable "vpc_id" {
 }
 
 variable "public_subnet_cidr_block" {
-  description = "Cidr block for public subnet"
+    description = "Cidr block for public subnet"
+}
+
+variable "key_name" {
+    description = "Keypair name"
 }
