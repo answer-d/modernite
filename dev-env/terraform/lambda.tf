@@ -22,8 +22,8 @@ resource "aws_lambda_function" "goodnight" {
 
 resource "aws_cloudwatch_event_rule" "bedtime" {
     name = "${var.prefix_name}-${var.system_name}-bedtime"
-    description = "Fires everyday @2:00"
-    schedule_expression = "cron(0 2 ? * * *)"
+    description = "Fires everyday @2:00 JST"
+    schedule_expression = "cron(0 17 ? * * *)"
 
     tags = {
         Name = "${var.prefix_name}-${var.system_name}-bedtime"
