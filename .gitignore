@@ -34,3 +34,12 @@ terraform.rc
 
 # binary
 **/bin/
+
+# lambda function aechive folder
+**/artifacts/
+
+# virtualenv
+.venv/
+
+# vscode
+.vscode/
