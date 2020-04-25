@@ -1,0 +1,16 @@
+---
+name: dev-env.terraform.ci
+
+on:
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  verification:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: test docker command
+      run: docker run helloworld
