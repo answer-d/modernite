@@ -30,24 +30,24 @@ data "aws_ami" "ami_amzn2" {
 }
 
 resource "aws_instance" "dev" {
-    ami = data.aws_ami.ami_amzn2.image_id
-    vpc_security_group_ids = [aws_security_group.public.id]
-    subnet_id = aws_subnet.public.id
-    key_name = var.key_name
-    instance_type = "t2.micro"
+  ami = data.aws_ami.ami_amzn2.image_id
+  vpc_security_group_ids = [aws_security_group.public.id]
+  subnet_id = aws_subnet.public.id
+  key_name = var.key_name
+  instance_type = "t2.micro"
 
-    tags = {
-        Name = "${var.prefix_name}-${var.system_name}-devinstance"
-        Author = var.author
-    }
+  tags = {
+    Name = "${var.prefix_name}-${var.system_name}-devinstance"
+    Author = var.author
+  }
 }
 
 output "public_ip" {
-    description = "Public IP addresses assigned to the instances, if applicable"
-    value = aws_instance.dev.public_ip
+  description = "Public IP addresses assigned to the instances, if applicable"
+  value = aws_instance.dev.public_ip
 }
 
 output "public_dns" {
-    description = "Public DNS assigned to the instances, if applicable"
-    value = aws_instance.dev.public_dns
+  description = "Public DNS assigned to the instances, if applicable"
+  value = aws_instance.dev.public_dns
 }
