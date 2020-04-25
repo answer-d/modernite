@@ -2,6 +2,8 @@
 name: dev-env.terraform.ci
 
 on:
+  push:
+    branches: [ master ]
   pull_request:
     branches: [ master ]
 
