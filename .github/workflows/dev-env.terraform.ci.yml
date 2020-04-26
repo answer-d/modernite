@@ -28,13 +28,6 @@ jobs:
           tf_actions_version: ${{ env.tf_version }}
           tf_actions_subcommand: 'validate'
           tf_actions_working_dir: ${{ env.tf_working_dir }}
-      # - name: terraform plan
-      #   uses: hashicorp/terraform-github-actions@master
-      #   with:
-      #     tf_actions_version: ${{ env.tf_version }}
-      #     tf_actions_subcommand: 'plan'
-      #     tf_actions_working_dir: ${{ env.tf_working_dir }}
-      #     args: --var-file vars/prod.tfvars
   tflint:
     runs-on: ubuntu-latest
     steps:
