@@ -11,15 +11,12 @@ env:
   tf_working_dir: dev-env/terraform
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  SECRET_TEST: ${{ secrets.SECRET_TEST }}
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: debug
-        run: echo $SECRET_TEST
       - name: terraform init
         uses: hashicorp/terraform-github-actions@master
         with:
@@ -27,6 +24,7 @@ jobs:
           tf_actions_subcommand: 'init'
           tf_actions_working_dir: ${{ env.tf_working_dir }}
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       - name: terraform validate
