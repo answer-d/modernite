@@ -1,6 +1,6 @@
 data "archive_file" "lambda_goodnight" {
-  type    = "zip"
-  source_dir  = "lambda/goodnight"
+  type = "zip"
+  source_dir = "lambda/goodnight"
   output_path = "lambda/artifacts/goodnight.zip"
 }
 

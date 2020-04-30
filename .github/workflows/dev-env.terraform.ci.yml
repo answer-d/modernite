@@ -33,4 +33,4 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: run tflint
-        run: docker run -v `pwd`/dev-env/terraform:/data:ro wata727/tflint:0.15.5 --var-file=vars/prod.tfvars
+        run: docker run -v `pwd`/dev-env/terraform:/data:ro wata727/tflint:0.15.5 -var-file=vars/prod.tfvars
