@@ -5,6 +5,8 @@ on:
   pull_request:
     branches:
       - master
+    paths:
+      - 'dev-env/terraform/**'
   push:
     branches:
       - master

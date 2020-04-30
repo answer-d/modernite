@@ -5,6 +5,8 @@ on:
   push:
     branches:
       - '*'
+    paths:
+      - 'dev-env/terraform/**'
 
 env:
   tf_version: 0.12.14
