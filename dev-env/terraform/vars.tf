@@ -11,7 +11,7 @@ variable "author" {
 }
 
 variable "vpc_id" {
-  description = "Your vpc id (pre-determined)"
+  description = "Vpc id (pre-determined)"
 }
 
 variable "public_subnet_cidr_block" {
@@ -19,5 +19,5 @@ variable "public_subnet_cidr_block" {
 }
 
 variable "key_name" {
-  description = "Keypair name"
+  description = "Keypair name (pre-determined)"
 }
