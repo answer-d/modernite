@@ -9,5 +9,6 @@ terraform {
   backend "s3" {
     bucket = "yama-dev-env-tfstate"
     key = "terraform.tfstate"
+    region = "ap-northeast-1"
   }
 }
