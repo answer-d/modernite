@@ -30,7 +30,8 @@ def lambda_handler(event, context):
   instances = get_my_running_ec2()
   instances.stop()
   response = {
-    "StopInstances": [(i.id) for i in instances]
+    "Notify": "true",
+    "StopInstances": [(i.id) for i in instances],
   }
   logger.info(response)
   return response
