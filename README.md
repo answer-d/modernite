@@ -13,5 +13,5 @@
     - VPC
     - キーペア
     - tfstate格納用S3
-- `vars.tf` 用の変数ファイルを作成
+- `vars.tf` 用の変数ファイルに環境ごと設定値を記載している
     - `vars/prod.tfvars` 参照
