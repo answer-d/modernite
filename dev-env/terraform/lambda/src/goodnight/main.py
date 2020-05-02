@@ -50,7 +50,7 @@ def lambda_handler(event, context):
     "instances": [(i.id) for i in instances],
   }
 
-  if len(response["StopInstances"]) > 0:
+  if len(response["instances"]) > 0:
     logger.info("Goodnight...",
       extra={"extra_data": response, "event": event})
 

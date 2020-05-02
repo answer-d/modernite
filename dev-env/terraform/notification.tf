@@ -29,6 +29,12 @@ resource "aws_lambda_function" "notify_teams" {
   memory_size = 128
   timeout = 30
 
+  environment {
+    variables = {
+      TEAMS_WEBHOOK_URL_SSM_NAME = var.teams_webhook_url_ssm_name
+    }
+  }
+
   tags = {
     Name = "${var.prefix_name}-${var.system_name}-notify-teams"
     Author = var.author
@@ -88,6 +94,16 @@ resource "aws_iam_role_policy" "lambda_notify_teams" {
 EOF
 }
 
+resource "aws_iam_role_policy_attachment" "ssm_ro" {
+  role = aws_iam_role.lambda_notify_teams.id
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "cloudwatchlogs_ro" {
+  role = aws_iam_role.lambda_notify_teams.id
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchLogsReadOnlyAccess"
+}
+
 resource "aws_cloudwatch_log_metric_filter" "goodnight_notify" {
   name = "${var.prefix_name}-${var.system_name}-goodnight-notify"
   pattern = "{$.extra_data.notify = \"true\"}"
@@ -108,7 +124,7 @@ resource "aws_cloudwatch_metric_alarm" "goodnight_notify" {
   evaluation_periods = 1
   namespace = aws_cloudwatch_log_metric_filter.goodnight_notify.metric_transformation[0].namespace
   metric_name = aws_cloudwatch_log_metric_filter.goodnight_notify.metric_transformation[0].name
-  period = 1
+  period = 10
   datapoints_to_alarm = 1
   alarm_description = "Alarm for goodnight lambda"
   actions_enabled = true
