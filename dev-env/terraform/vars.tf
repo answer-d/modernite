@@ -21,3 +21,7 @@ variable "public_subnet_cidr_block" {
 variable "key_name" {
   description = "Keypair name (pre-determined)"
 }
+
+variable "teams_webhook_url_ssm_name" {
+  description = "SSM Parameter to which teams webhook url is set (pre-determined)"
+}
