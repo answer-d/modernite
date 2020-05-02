@@ -1,11 +1,26 @@
 import boto3
 import logging
+import json
+
+
+class FormatterJSON(logging.Formatter):
+  def format(self, record):
+    j = {
+      'loglevel': record.levelname,
+      'message': record.getMessage(),
+      'extra_data': record.__dict__.get('extra_data', {}),
+      'event': record.__dict__.get('event', {}),
+    }
+
+    return json.dumps(j, ensure_ascii=False)
 
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
+formatter = FormatterJSON('[%(levelname)s]\t%(message)s\n')
 handler = logging.StreamHandler()
 handler.setLevel(logging.INFO)
+handler.setFormatter(formatter)
 logger.addHandler(handler)
 
 
@@ -23,6 +38,7 @@ def get_my_running_ec2():
       },
     ]
   )
+
   return result
 
 
@@ -30,12 +46,16 @@ def lambda_handler(event, context):
   instances = get_my_running_ec2()
   instances.stop()
   response = {
-    "Notify": "true",
-    "StopInstances": [(i.id) for i in instances],
+    "notify": "true",
+    "instances": [(i.id) for i in instances],
   }
-  logger.info(response)
+
+  if len(response["StopInstances"]) > 0:
+    logger.info("Goodnight...",
+      extra={"extra_data": response, "event": event})
+
   return response
 
 
 if __name__ == "__main__":
-  logger.info(lambda_handler(0, 0))
+  lambda_handler(0, 0)
