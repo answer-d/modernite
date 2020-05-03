@@ -44,17 +44,21 @@ def get_my_running_ec2():
 
 def lambda_handler(event, context):
   instances = get_my_running_ec2()
+
+  # ec2.instances.filterで得られるオブジェクトは常に最新状態を反映するため、初期状態をバッファに格納
+  instances_buffer = [i.id for i in instances]
+
+  if len(instances_buffer) > 0:
+    logger.warning("Goodnight...",
+      extra={"extra_data": {"instances": instances_buffer}, "event": event})
   instances.stop()
-  response = {
-    "notify": "true",
-    "instances": [(i.id) for i in instances],
-  }
 
-  if len(response["instances"]) > 0:
-    logger.info("Goodnight...",
-      extra={"extra_data": response, "event": event})
+  # インスタンスが停止しているかチェック
+  if len(list(instances)) > 0:
+    logger.error("These instances suffer from insomnia!",
+      extra={"extra_data": {"instances": [i.id for i in list(instances)]}, "event": event})
 
-  return response
+  return {"instances": instances_buffer}
 
 
 if __name__ == "__main__":
