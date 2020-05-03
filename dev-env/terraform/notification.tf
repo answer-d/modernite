@@ -129,6 +129,7 @@ resource "aws_cloudwatch_metric_alarm" "goodnight_anomaly" {
   alarm_description = "Alarm for goodnight lambda"
   actions_enabled = true
   alarm_actions = [aws_sns_topic.default.arn]
+  treat_missing_data = "ignore"
 
   tags = {
     Name = "${var.prefix_name}-${var.system_name}-goodnight-notify"
