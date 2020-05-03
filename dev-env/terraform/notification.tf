@@ -104,9 +104,9 @@ resource "aws_iam_role_policy_attachment" "cloudwatchlogs_ro" {
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchLogsReadOnlyAccess"
 }
 
-resource "aws_cloudwatch_log_metric_filter" "goodnight_notify" {
+resource "aws_cloudwatch_log_metric_filter" "goodnight_anomaly" {
   name = "${var.prefix_name}-${var.system_name}-goodnight-notify"
-  pattern = "{$.extra_data.notify = \"true\"}"
+  pattern = "{$.loglevel = \"WARNING\" || $.loglevel = \"ERROR\"}"
   log_group_name = "/aws/lambda/${aws_lambda_function.goodnight.function_name}"
 
   metric_transformation {
@@ -116,14 +116,14 @@ resource "aws_cloudwatch_log_metric_filter" "goodnight_notify" {
   }
 }
 
-resource "aws_cloudwatch_metric_alarm" "goodnight_notify" {
+resource "aws_cloudwatch_metric_alarm" "goodnight_anomaly" {
   alarm_name = "${var.prefix_name}-${var.system_name}-goodnight-notify"
   statistic = "SampleCount"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   threshold = 0
   evaluation_periods = 1
-  namespace = aws_cloudwatch_log_metric_filter.goodnight_notify.metric_transformation[0].namespace
-  metric_name = aws_cloudwatch_log_metric_filter.goodnight_notify.metric_transformation[0].name
+  namespace = aws_cloudwatch_log_metric_filter.goodnight_anomaly.metric_transformation[0].namespace
+  metric_name = aws_cloudwatch_log_metric_filter.goodnight_anomaly.metric_transformation[0].name
   period = 10
   datapoints_to_alarm = 1
   alarm_description = "Alarm for goodnight lambda"
