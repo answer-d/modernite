@@ -1,26 +1,18 @@
-data "archive_file" "lambda_goodnight" {
-  type = "zip"
-  source_dir = "lambda/src/goodnight"
-  output_path = "lambda/artifacts/goodnight.zip"
+data "aws_iam_policy_document" "assume_role_policy_lambda_goodnight" {
+  statement {
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
+  }
 }
 
 resource "aws_iam_role" "lambda_goodnight" {
   name = "${var.prefix_name}-${var.system_name}-lambda-goodnight"
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "lambda.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
-    }
-  ]
-}
-EOF
+  path = "/${var.prefix_name}-${var.system_name}/"
+  assume_role_policy = data.aws_iam_policy_document.assume_role_policy_lambda_goodnight.json
 
   tags = {
     Name = "${var.prefix_name}-${var.system_name}-lambda-goodnight"
@@ -28,43 +20,45 @@ EOF
   }
 }
 
-resource "aws_iam_role_policy" "lambda_goodnight" {
-  name = "${var.prefix_name}-${var.system_name}-lambda-goodnight"
+resource "aws_iam_role_policy_attachment" "goodnight_lambda_basic_execution" {
   role = aws_iam_role.lambda_goodnight.id
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "logs:CreateLogGroup",
-        "logs:CreateLogStream",
-        "logs:PutLogEvents"
-      ],
-      "Resource": "arn:aws:logs:*:*:*"
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "ec2:DescribeInstances",
-        "ec2:DescribeTags"
-      ],
-      "Resource": "*"
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "ec2:StopInstances"
-      ],
-      "Resource": "arn:aws:ec2:*:*:instance/*",
-      "Condition": {
-        "StringEquals": {"ec2:ResourceTag/Author": "${var.author}"}
-      }
-    }
-  ]
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
-EOF
+
+resource "aws_iam_role_policy_attachment" "goodnight_ec2_ro" {
+  role = aws_iam_role.lambda_goodnight.id
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess"
+}
+
+data "aws_iam_policy_document" "policy_lambda_goodnight_stop_my_instances" {
+  statement {
+    sid = "${var.prefix_name}-${var.system_name}-lambda-goodnight-allow-stop-my-instances"
+    actions = ["ec2:StopInstances"]
+    resources = ["arn:aws:ec2:*:*:instance/*"]
+    condition {
+      test = "StringEquals"
+      variable = "ec2:ResourceTag/Author"
+      values = [var.author]
+    }
+  }
+}
+
+resource "aws_iam_policy" "lambda_goodnight_stop_my_instances" {
+  name = "${var.prefix_name}-${var.system_name}-lambda-goodnight-stop-my-instances"
+  path = "/${var.prefix_name}-${var.system_name}/"
+  policy = data.aws_iam_policy_document.policy_lambda_goodnight_stop_my_instances.json
+}
+
+resource "aws_iam_role_policy_attachment" "goodnight_stop_my_instances" {
+  role = aws_iam_role.lambda_goodnight.id
+  policy_arn = aws_iam_policy.lambda_goodnight_stop_my_instances.arn
+}
+
+
+data "archive_file" "lambda_goodnight" {
+  type = "zip"
+  source_dir = "lambda/src/goodnight"
+  output_path = "lambda/artifacts/goodnight.zip"
 }
 
 resource "aws_lambda_function" "goodnight" {
@@ -82,6 +76,7 @@ resource "aws_lambda_function" "goodnight" {
     Author = var.author
   }
 }
+
 
 resource "aws_cloudwatch_event_rule" "bedtime" {
   name = "${var.prefix_name}-${var.system_name}-bedtime"

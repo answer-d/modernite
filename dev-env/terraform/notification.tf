@@ -49,7 +49,7 @@ resource "aws_lambda_permission" "sns_notify_teams" {
   source_arn = aws_sns_topic.default.arn
 }
 
-data "aws_iam_policy_document" "assume_role_policy_notify_teams" {
+data "aws_iam_policy_document" "assume_role_policy_lambda_notify_teams" {
   statement {
     actions = ["sts:AssumeRole"]
 
@@ -63,7 +63,7 @@ data "aws_iam_policy_document" "assume_role_policy_notify_teams" {
 resource "aws_iam_role" "lambda_notify_teams" {
   name = "${var.prefix_name}-${var.system_name}-lambda-notify-teams"
   path = "/${var.prefix_name}-${var.system_name}/"
-  assume_role_policy = data.aws_iam_policy_document.assume_role_policy_notify_teams.json
+  assume_role_policy = data.aws_iam_policy_document.assume_role_policy_lambda_notify_teams.json
 
   tags = {
     Name = "${var.prefix_name}-${var.system_name}-lambda-notify-teams"
