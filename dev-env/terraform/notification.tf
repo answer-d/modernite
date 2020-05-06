@@ -49,16 +49,6 @@ resource "aws_lambda_permission" "sns_notify_teams" {
   source_arn = aws_sns_topic.default.arn
 }
 
-resource "aws_lambda_function_event_invoke_config" "notify_teams" {
-  function_name = aws_lambda_function.notify_teams.function_name
-
-  destination_config {
-    on_failure {
-      destination = aws_sns_topic.default.arn
-    }
-  }
-}
-
 data "aws_iam_policy_document" "assume_role_policy_lambda_notify_teams" {
   statement {
     actions = ["sts:AssumeRole"]
