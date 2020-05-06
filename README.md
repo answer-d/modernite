@@ -18,3 +18,5 @@
         - Teams Incoming Webhook URLをSecure Stringで
 - `vars.tf` 用の変数ファイルに環境ごと設定値を記載している
     - `vars/prod.tfvars` 参照
+- tfstateを置くバケット名は `main.tf` に記載
+    - 変数参照できなかった
