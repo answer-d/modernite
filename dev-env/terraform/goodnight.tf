@@ -32,7 +32,7 @@ resource "aws_iam_role_policy_attachment" "goodnight_ec2_ro" {
 
 data "aws_iam_policy_document" "policy_lambda_goodnight_stop_my_instances" {
   statement {
-    sid = "${var.prefix_name}-${var.system_name}-lambda-goodnight-allow-stop-my-instances"
+    sid = "LambdaGoodnightStopMyInstances"
     actions = ["ec2:StopInstances"]
     resources = ["arn:aws:ec2:*:*:instance/*"]
     condition {
