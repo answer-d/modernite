@@ -96,25 +96,6 @@ resource "aws_iam_role_policy_attachment" "notify_teams_cloudwatchlogs_ro" {
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchLogsReadOnlyAccess"
 }
 
-data "aws_iam_policy_document" "policy_lambda_notify_teams_sns_publish" {
-  statement {
-    sid = "LambdaNotifyTeamsSnsPublish"
-    actions = ["sns:Publish"]
-    resources = [aws_sns_topic.default.arn]
-  }
-}
-
-resource "aws_iam_policy" "lambda_notify_teams_sns_publish" {
-  name = "${var.prefix_name}-${var.system_name}-lambda-notify-teams-sns-publish"
-  path = "/${var.prefix_name}-${var.system_name}/"
-  policy = data.aws_iam_policy_document.policy_lambda_notify_teams_sns_publish.json
-}
-
-resource "aws_iam_role_policy_attachment" "notify_teams_sns_publish" {
-  role = aws_iam_role.lambda_notify_teams.id
-  policy_arn = aws_iam_policy.lambda_notify_teams_sns_publish.arn
-}
-
 
 resource "aws_cloudwatch_log_metric_filter" "goodnight_anomaly" {
   name = "${var.prefix_name}-${var.system_name}-goodnight-notify"
