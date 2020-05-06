@@ -41,13 +41,3 @@ resource "aws_instance" "dev" {
     Author = var.author
   }
 }
-
-output "public_ip" {
-  description = "Public IP addresses assigned to the instances, if applicable"
-  value = aws_instance.dev.public_ip
-}
-
-output "public_dns" {
-  description = "Public DNS assigned to the instances, if applicable"
-  value = aws_instance.dev.public_dns
-}

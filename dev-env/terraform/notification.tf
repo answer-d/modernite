@@ -49,23 +49,21 @@ resource "aws_lambda_permission" "sns_notify_teams" {
   source_arn = aws_sns_topic.default.arn
 }
 
+data "aws_iam_policy_document" "assume_role_policy_lambda_notify_teams" {
+  statement {
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
+  }
+}
+
 resource "aws_iam_role" "lambda_notify_teams" {
   name = "${var.prefix_name}-${var.system_name}-lambda-notify-teams"
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "lambda.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
-    }
-  ]
-}
-EOF
+  path = "/${var.prefix_name}-${var.system_name}/"
+  assume_role_policy = data.aws_iam_policy_document.assume_role_policy_lambda_notify_teams.json
 
   tags = {
     Name = "${var.prefix_name}-${var.system_name}-lambda-notify-teams"
@@ -73,36 +71,21 @@ EOF
   }
 }
 
-resource "aws_iam_role_policy" "lambda_notify_teams" {
-  name = "${var.prefix_name}-${var.system_name}-lambda-notify-teams"
+resource "aws_iam_role_policy_attachment" "notify_teams_lambda_basic_execution" {
   role = aws_iam_role.lambda_notify_teams.id
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "logs:CreateLogGroup",
-        "logs:CreateLogStream",
-        "logs:PutLogEvents"
-      ],
-      "Resource": "arn:aws:logs:*:*:*"
-    }
-  ]
-}
-EOF
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
-resource "aws_iam_role_policy_attachment" "ssm_ro" {
+resource "aws_iam_role_policy_attachment" "notify_teams_ssm_ro" {
   role = aws_iam_role.lambda_notify_teams.id
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess"
 }
 
-resource "aws_iam_role_policy_attachment" "cloudwatchlogs_ro" {
+resource "aws_iam_role_policy_attachment" "notify_teams_cloudwatchlogs_ro" {
   role = aws_iam_role.lambda_notify_teams.id
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchLogsReadOnlyAccess"
 }
+
 
 resource "aws_cloudwatch_log_metric_filter" "goodnight_anomaly" {
   name = "${var.prefix_name}-${var.system_name}-goodnight-notify"

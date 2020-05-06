@@ -13,6 +13,7 @@
     - VPC
     - キーペア
     - tfstate格納用S3
+        - `main.tf` にバケット名を記載
     - SSM Parameter Store
         - Teams Incoming Webhook URLをSecure Stringで
 - `vars.tf` 用の変数ファイルに環境ごと設定値を記載している
