@@ -69,7 +69,7 @@ resource "aws_lambda_function" "goodnight" {
   source_code_hash = data.archive_file.lambda_goodnight.output_base64sha256
   runtime = "python3.6"
   memory_size = 128
-  timeout = 30
+  timeout = 10
 
   tags = {
     Name = "${var.prefix_name}-${var.system_name}-goodnight"
