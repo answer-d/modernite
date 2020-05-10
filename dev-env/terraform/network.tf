@@ -1,9 +1,15 @@
-data "aws_vpc" "default" {
-  id = var.vpc_id
+resource "aws_vpc" "default" {
+  cidr_block = var.vpc_cidr
+  enable_dns_hostnames = true
+
+  tags = {
+    Name = "${var.prefix_name}-${var.system_name}"
+    Author = var.author
+  }
 }
 
 resource "aws_internet_gateway" "gw" {
-  vpc_id = data.aws_vpc.default.id
+  vpc_id = aws_vpc.default.id
 
   tags = {
     Name = "${var.prefix_name}-${var.system_name}-ig"
@@ -12,7 +18,7 @@ resource "aws_internet_gateway" "gw" {
 }
 
 resource "aws_subnet" "public" {
-  vpc_id = data.aws_vpc.default.id
+  vpc_id = aws_vpc.default.id
   cidr_block = var.public_subnet_cidr_block
   map_public_ip_on_launch = true
   
@@ -23,7 +29,7 @@ resource "aws_subnet" "public" {
 }
 
 resource "aws_route_table" "public" {
-  vpc_id = data.aws_vpc.default.id
+  vpc_id = aws_vpc.default.id
 
   route {
     gateway_id = aws_internet_gateway.gw.id
@@ -42,7 +48,7 @@ resource "aws_route_table_association" "public" {
 }
 
 resource "aws_security_group" "public" {
-  vpc_id = data.aws_vpc.default.id
+  vpc_id = aws_vpc.default.id
   name = "${var.prefix_name}-${var.system_name}-public-sg"
   
   ingress {
@@ -53,7 +59,7 @@ resource "aws_security_group" "public" {
     description = "allow ssh incoming from any network"
   }
   ingress {
-    cidr_blocks = [data.aws_vpc.default.cidr_block]
+    cidr_blocks = [aws_vpc.default.cidr_block]
     from_port = -1
     to_port = -1
     protocol = "icmp"

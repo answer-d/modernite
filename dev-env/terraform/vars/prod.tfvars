@@ -1,7 +1,7 @@
 prefix_name = "yama"
 system_name = "dev-env"
 author = "yamaguti-dxa"
-vpc_id = "vpc-04abf055a63457640"
+vpc_cidr = "10.100.0.0/16"
 public_subnet_cidr_block = "10.100.0.0/24"
 key_name = "yama-yamaguti-dxa"
 teams_webhook_url_ssm_name = "yama-dev-env-teams-webhook-url"

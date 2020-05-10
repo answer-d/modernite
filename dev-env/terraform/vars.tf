@@ -10,8 +10,8 @@ variable "author" {
   description = "The value of the tag `Author` to be assigned to all resources"
 }
 
-variable "vpc_id" {
-  description = "Vpc id (pre-determined)"
+variable "vpc_cidr" {
+  description = "Cidr block for vpc"
 }
 
 variable "public_subnet_cidr_block" {
