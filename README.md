@@ -10,7 +10,6 @@
     - *AWS_SECRET_ACCESS_KEY*
         - IAMの作成権限が必要なのでPowerUserAccessのみでは動かない
 - 事前作成するAWSリソース
-    - VPC
     - キーペア
     - tfstate格納用S3
         - `main.tf` にバケット名を記載
