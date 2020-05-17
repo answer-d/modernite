@@ -6,6 +6,10 @@ variable "system_name" {
   description = "String to be inserted to the resource name"
 }
 
+variable "stage" {
+  description = "System stage"
+}
+
 variable "author" {
   description = "The value of the tag `Author` to be assigned to all resources"
 }

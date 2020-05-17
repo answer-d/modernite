@@ -1,5 +1,6 @@
 prefix_name = "yama"
 system_name = "dev-env"
+stage = "prod"
 author = "yamaguti-dxa"
 vpc_cidr = "10.100.0.0/16"
 public_subnet_cidr_block = "10.100.0.0/24"

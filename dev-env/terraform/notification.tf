@@ -1,9 +1,10 @@
 resource "aws_sns_topic" "default" {
-  name = "${var.prefix_name}-${var.system_name}"
+  name = "${var.prefix_name}-${var.system_name}-${var.stage}"
 
   tags = {
-    Name = "${var.prefix_name}-${var.system_name}"
+    Name = "${var.prefix_name}-${var.system_name}-${var.stage}"
     Author = var.author
+    Stage = var.stage
   }
 }
 
@@ -21,7 +22,7 @@ data "archive_file" "lambda_notify_teams" {
 
 resource "aws_lambda_function" "notify_teams" {
   filename = data.archive_file.lambda_notify_teams.output_path
-  function_name = "${var.prefix_name}-${var.system_name}-notify-teams"
+  function_name = "${var.prefix_name}-${var.system_name}-${var.stage}-notify-teams"
   role = aws_iam_role.lambda_notify_teams.arn
   handler = "main.lambda_handler"
   source_code_hash = data.archive_file.lambda_notify_teams.output_base64sha256
@@ -36,8 +37,20 @@ resource "aws_lambda_function" "notify_teams" {
   }
 
   tags = {
-    Name = "${var.prefix_name}-${var.system_name}-notify-teams"
+    Name = "${var.prefix_name}-${var.system_name}-${var.stage}-notify-teams"
     Author = var.author
+    Stage = var.stage
+  }
+}
+
+resource "aws_cloudwatch_log_group" "lambda_notify_teams" {
+  name = "/aws/lambda/${aws_lambda_function.notify_teams.function_name}"
+  retention_in_days = 14
+
+  tags = {
+    Name = "${var.prefix_name}-${var.system_name}-${var.stage}-lambda-notify-teams"
+    Author = var.author
+    Stage = var.stage
   }
 }
 
@@ -61,13 +74,14 @@ data "aws_iam_policy_document" "assume_role_policy_lambda_notify_teams" {
 }
 
 resource "aws_iam_role" "lambda_notify_teams" {
-  name = "${var.prefix_name}-${var.system_name}-lambda-notify-teams"
-  path = "/${var.prefix_name}-${var.system_name}/"
+  name = "${var.prefix_name}-${var.system_name}-${var.stage}-lambda-notify-teams"
+  path = "/${var.prefix_name}-${var.system_name}-${var.stage}/"
   assume_role_policy = data.aws_iam_policy_document.assume_role_policy_lambda_notify_teams.json
 
   tags = {
-    Name = "${var.prefix_name}-${var.system_name}-lambda-notify-teams"
+    Name = "${var.prefix_name}-${var.system_name}-${var.stage}-lambda-notify-teams"
     Author = var.author
+    Stage = var.stage
   }
 }
 
@@ -88,19 +102,21 @@ resource "aws_iam_role_policy_attachment" "notify_teams_cloudwatchlogs_ro" {
 
 
 resource "aws_cloudwatch_log_metric_filter" "goodnight_anomaly" {
-  name = "${var.prefix_name}-${var.system_name}-goodnight-notify"
+  name = "${var.prefix_name}-${var.system_name}-${var.stage}-goodnight-notify"
   pattern = "{$.loglevel = \"WARNING\" || $.loglevel = \"ERROR\"}"
   log_group_name = "/aws/lambda/${aws_lambda_function.goodnight.function_name}"
 
   metric_transformation {
     name = "goodnight-notify"
-    namespace = "${var.prefix_name}/${var.system_name}/Lambda"
+    namespace = "${var.prefix_name}/${var.system_name}/${var.stage}/Lambda"
     value = "1"
   }
+
+  depends_on = [aws_cloudwatch_log_group.lambda_goodnight]
 }
 
 resource "aws_cloudwatch_metric_alarm" "goodnight_anomaly" {
-  alarm_name = "${var.prefix_name}-${var.system_name}-goodnight-notify"
+  alarm_name = "${var.prefix_name}-${var.system_name}-${var.stage}-goodnight-notify"
   statistic = "SampleCount"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   threshold = 0
@@ -115,7 +131,8 @@ resource "aws_cloudwatch_metric_alarm" "goodnight_anomaly" {
   treat_missing_data = "notBreaching"
 
   tags = {
-    Name = "${var.prefix_name}-${var.system_name}-goodnight-notify"
+    Name = "${var.prefix_name}-${var.system_name}-${var.stage}-goodnight-notify"
     Author = var.author
+    Stage = var.stage
   }
 }

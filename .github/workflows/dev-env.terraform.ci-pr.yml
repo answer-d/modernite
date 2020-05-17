@@ -19,7 +19,7 @@ env:
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
 jobs:
-  ut:
+  terraform-ut:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -45,3 +45,16 @@ jobs:
           tf_actions_working_dir: ${{ env.tf_working_dir }}
           tf_actions_comment: true
           args: -var-file vars/prod.tfvars -input=false
+  terratest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: actions/setup-go@v2
+        with:
+          go-version: 1.14
+      - name: Download Go Modules
+        working-directory: dev-env/terraform/tests
+        run: go mod download
+      - name: Run Go Tests
+        working-directory: dev-env/terraform/tests
+        run: go test -v -timeout 30m

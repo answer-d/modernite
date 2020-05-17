@@ -10,13 +10,14 @@ data "aws_iam_policy_document" "assume_role_policy_lambda_goodnight" {
 }
 
 resource "aws_iam_role" "lambda_goodnight" {
-  name = "${var.prefix_name}-${var.system_name}-lambda-goodnight"
+  name = "${var.prefix_name}-${var.system_name}-${var.stage}-lambda-goodnight"
   path = "/${var.prefix_name}-${var.system_name}/"
   assume_role_policy = data.aws_iam_policy_document.assume_role_policy_lambda_goodnight.json
 
   tags = {
-    Name = "${var.prefix_name}-${var.system_name}-lambda-goodnight"
+    Name = "${var.prefix_name}-${var.system_name}-${var.stage}-lambda-goodnight"
     Author = var.author
+    Stage = var.stage
   }
 }
 
@@ -44,8 +45,8 @@ data "aws_iam_policy_document" "policy_lambda_goodnight_stop_my_instances" {
 }
 
 resource "aws_iam_policy" "lambda_goodnight_stop_my_instances" {
-  name = "${var.prefix_name}-${var.system_name}-lambda-goodnight-stop-my-instances"
-  path = "/${var.prefix_name}-${var.system_name}/"
+  name = "${var.prefix_name}-${var.system_name}-${var.stage}-lambda-goodnight-stop-my-instances"
+  path = "/${var.prefix_name}-${var.system_name}-${var.stage}/"
   policy = data.aws_iam_policy_document.policy_lambda_goodnight_stop_my_instances.json
 }
 
@@ -63,7 +64,7 @@ data "archive_file" "lambda_goodnight" {
 
 resource "aws_lambda_function" "goodnight" {
   filename = data.archive_file.lambda_goodnight.output_path
-  function_name = "${var.prefix_name}-${var.system_name}-goodnight"
+  function_name = "${var.prefix_name}-${var.system_name}-${var.stage}-goodnight"
   role = aws_iam_role.lambda_goodnight.arn
   handler = "main.lambda_handler"
   source_code_hash = data.archive_file.lambda_goodnight.output_base64sha256
@@ -72,26 +73,39 @@ resource "aws_lambda_function" "goodnight" {
   timeout = 10
 
   tags = {
-    Name = "${var.prefix_name}-${var.system_name}-goodnight"
+    Name = "${var.prefix_name}-${var.system_name}-${var.stage}-goodnight"
     Author = var.author
+    Stage = var.stage
+  }
+}
+
+resource "aws_cloudwatch_log_group" "lambda_goodnight" {
+  name = "/aws/lambda/${aws_lambda_function.goodnight.function_name}"
+  retention_in_days = 14
+
+  tags = {
+    Name = "${var.prefix_name}-${var.system_name}-${var.stage}-lambda-goodnight"
+    Author = var.author
+    Stage = var.stage
   }
 }
 
 
 resource "aws_cloudwatch_event_rule" "bedtime" {
-  name = "${var.prefix_name}-${var.system_name}-bedtime"
+  name = "${var.prefix_name}-${var.system_name}-${var.stage}-bedtime"
   description = "Fires everyday @2:00 JST"
   schedule_expression = "cron(0 17 ? * * *)"
 
   tags = {
-    Name = "${var.prefix_name}-${var.system_name}-bedtime"
+    Name = "${var.prefix_name}-${var.system_name}-${var.stage}-bedtime"
     Author = var.author
+    Stage = var.stage
   }
 }
 
 resource "aws_cloudwatch_event_target" "goodnight" {
   rule = aws_cloudwatch_event_rule.bedtime.name
-  target_id = "${var.prefix_name}-${var.system_name}-goodnight"
+  target_id = "${var.prefix_name}-${var.system_name}-${var.stage}-goodnight"
   arn = aws_lambda_function.goodnight.arn
 }
 
