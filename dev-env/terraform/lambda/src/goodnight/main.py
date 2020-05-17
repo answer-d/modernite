@@ -1,6 +1,10 @@
 import boto3
 import logging
 import json
+import os
+
+
+STAGE = os.environ['STAGE']
 
 
 class FormatterJSON(logging.Formatter):
@@ -31,6 +35,10 @@ def get_my_running_ec2():
       {
         'Name': 'tag:Author',
         'Values': ['yamaguti-dxa'],
+      },
+      {
+        'Name': 'tag:Stage',
+        'Values': [STAGE],
       },
       {
         'Name': 'instance-state-name',

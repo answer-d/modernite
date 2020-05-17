@@ -21,32 +21,27 @@ env:
 jobs:
   terraform-ut:
     runs-on: ubuntu-latest
+    env:
+      STAGE: prod
     steps:
       - uses: actions/checkout@v2
-      - name: terraform init
-        uses: hashicorp/terraform-github-actions@master
+      - name: Setup terraform
+        uses: hashicorp/setup-terraform@v1
         with:
-          tf_actions_version: ${{ env.tf_version }}
-          tf_actions_subcommand: 'init'
-          tf_actions_working_dir: ${{ env.tf_working_dir }}
-          tf_actions_comment: true
-      - name: terraform validate
-        uses: hashicorp/terraform-github-actions@master
-        with:
-          tf_actions_version: ${{ env.tf_version }}
-          tf_actions_subcommand: 'validate'
-          tf_actions_working_dir: ${{ env.tf_working_dir }}
-          tf_actions_comment: true
-      - name: terraform plan
-        uses: hashicorp/terraform-github-actions@master
-        with:
-          tf_actions_version: ${{ env.tf_version }}
-          tf_actions_subcommand: 'plan'
-          tf_actions_working_dir: ${{ env.tf_working_dir }}
-          tf_actions_comment: true
-          args: -var-file vars/prod.tfvars -input=false
+          terraform_version: ${{ env.tf_version }}
+      - name: Run terraform init
+        working-directory: ${{ env.tf_working_dir }}
+        run: terraform init
+      - name: Run terraform validate
+        working-directory: ${{ env.tf_working_dir }}
+        run: terraform validate
+      - name: Run terraform plan
+        working-directory: ${{ env.tf_working_dir }}
+        run: terraform plan -var-file vars/prod.tfvars -input=false
   terratest:
     runs-on: ubuntu-latest
+    env:
+      STAGE: test
     steps:
       - uses: actions/checkout@v2
       - name: Setup Go

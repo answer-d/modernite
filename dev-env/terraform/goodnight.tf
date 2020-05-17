@@ -72,6 +72,12 @@ resource "aws_lambda_function" "goodnight" {
   memory_size = 128
   timeout = 10
 
+  environment {
+    variables = {
+      STAGE = var.stage
+    }
+  }
+
   tags = {
     Name = "${var.prefix_name}-${var.system_name}-${var.stage}-goodnight"
     Author = var.author
