@@ -56,6 +56,11 @@ jobs:
       - name: Download Go Modules
         working-directory: dev-env/terraform/tests
         run: go mod download
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+      - name: Terraform init
+        working-directory: dev-env/terraform
+        run: terraform init
       - name: Run Go Tests
         working-directory: dev-env/terraform/tests
         run: go test -v -timeout 30m
