@@ -12,9 +12,9 @@ on:
       - master
 
 env:
-  tf_version: 0.12.24
-  tf_working_dir: ./dev-env/terraform
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  go_version: 1.14
+  tf_version: 0.12.25
+  tf_working_dir: dev-env/terraform
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
@@ -47,7 +47,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v2
         with:
-          go-version: 1.14
+          go-version: ${{ env.go_version }}
       - name: Download Go Modules
         working-directory: dev-env/terraform/tests
         run: go mod download
