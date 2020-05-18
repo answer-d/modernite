@@ -17,4 +17,4 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: run tflint
-        run: docker run -v `pwd`${{ env.tf_working_dir }}:/data:ro wata727/tflint:latest --var-file=vars/prod.tfvars
+        run: docker run -v `pwd`/${{ env.tf_working_dir }}:/data:ro wata727/tflint:latest --var-file=vars/prod.tfvars

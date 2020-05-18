@@ -50,14 +50,12 @@ jobs:
           go-version: ${{ env.go_version }}
       - name: Download Go Modules
         working-directory: dev-env/terraform/tests
-        run: go mod download
+        run: go get -v -d -t ./...
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
       - name: Terraform init
         working-directory: dev-env/terraform
         run: terraform init
-      - name: Setup awscli
-        uses: chrislennon/action-aws-cli@v1.1
       - name: Run Go Tests
         working-directory: dev-env/terraform/tests
         run: go test -v -timeout 30m
