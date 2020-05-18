@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/gruntwork-io/terratest/modules/aws"
 	"github.com/gruntwork-io/terratest/modules/terraform"
@@ -31,6 +32,8 @@ func TestAll(t *testing.T) {
 
 	// dev-envインスタンスの存在確認
 	assert.NotEmpty(t, terraform.Output(t, terraformOptions, "dev_instance_public_ip"))
+
+	time.Sleep(30 * time.Second)
 
 	/* goodnight lambdaの動作テスト */
 	functionName := terraform.Output(t, terraformOptions, "lambda_goodnight_function_name")
