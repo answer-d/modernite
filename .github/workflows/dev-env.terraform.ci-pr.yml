@@ -12,36 +12,50 @@ on:
       - master
 
 env:
-  tf_version: 0.12.24
-  tf_working_dir: ./dev-env/terraform
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  go_version: 1.14
+  tf_version: 0.12.25
+  tf_working_dir: dev-env/terraform
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
 jobs:
-  ut:
+  terraform-ut:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: terraform init
-        uses: hashicorp/terraform-github-actions@master
+      - name: Setup terraform
+        uses: hashicorp/setup-terraform@v1
         with:
-          tf_actions_version: ${{ env.tf_version }}
-          tf_actions_subcommand: 'init'
-          tf_actions_working_dir: ${{ env.tf_working_dir }}
-          tf_actions_comment: true
-      - name: terraform validate
-        uses: hashicorp/terraform-github-actions@master
+          terraform_version: ${{ env.tf_version }}
+      - name: Run terraform init
+        working-directory: ${{ env.tf_working_dir }}
+        run: terraform init
+      - name: Run terraform validate
+        working-directory: ${{ env.tf_working_dir }}
+        run: terraform validate
+      - name: Switch workspace to prod
+        working-directory: ${{ env.tf_working_dir }}
+        run: terraform workspace select prod
+      - name: Run terraform plan for prod
+        working-directory: ${{ env.tf_working_dir }}
+        run: terraform plan -var-file vars/prod.tfvars -input=false
+
+  terratest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Go
+        uses: actions/setup-go@v2
         with:
-          tf_actions_version: ${{ env.tf_version }}
-          tf_actions_subcommand: 'validate'
-          tf_actions_working_dir: ${{ env.tf_working_dir }}
-          tf_actions_comment: true
-      - name: terraform plan
-        uses: hashicorp/terraform-github-actions@master
-        with:
-          tf_actions_version: ${{ env.tf_version }}
-          tf_actions_subcommand: 'plan'
-          tf_actions_working_dir: ${{ env.tf_working_dir }}
-          tf_actions_comment: true
-          args: -var-file vars/prod.tfvars -input=false
+          go-version: ${{ env.go_version }}
+      - name: Download Go Modules
+        working-directory: ${{ env.tf_working_dir }}/tests
+        run: go get -v -d -t ./...
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+      - name: Terraform init
+        working-directory: ${{ env.tf_working_dir }}
+        run: terraform init
+      - name: Run Go Tests
+        working-directory: ${{ env.tf_working_dir }}/tests
+        run: go test -v -timeout 30m

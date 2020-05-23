@@ -7,9 +7,8 @@ on:
       - published
 
 env:
-  tf_version: 0.12.24
-  tf_working_dir: ./dev-env/terraform
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  tf_version: 0.12.25
+  tf_working_dir: dev-env/terraform
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
@@ -18,16 +17,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: terraform init
-        uses: hashicorp/terraform-github-actions@master
+      - name: Setup terraform
+        uses: hashicorp/setup-terraform@v1
         with:
-          tf_actions_version: ${{ env.tf_version }}
-          tf_actions_subcommand: 'init'
-          tf_actions_working_dir: ${{ env.tf_working_dir }}
-      - name: terraform apply
-        uses: hashicorp/terraform-github-actions@master
-        with:
-          tf_actions_version: ${{ env.tf_version }}
-          tf_actions_subcommand: 'apply'
-          tf_actions_working_dir: ${{ env.tf_working_dir }}
-          args: -var-file vars/prod.tfvars -input=false -auto-approve
+          terraform_version: ${{ env.tf_version }}
+      - name: Run terraform init
+        working-directory: ${{ env.tf_working_dir }}
+        run: terraform init
+      - name: Switch workspace to prod
+        working-directory: ${{ env.tf_working_dir }}
+        run: terraform workspace select prod
+      - name: Run terraform apply for prod
+        working-directory: ${{ env.tf_working_dir }}
+        run: terraform apply -var-file vars/prod.tfvars -input=false -auto-approve

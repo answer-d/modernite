@@ -37,7 +37,8 @@ resource "aws_instance" "dev" {
   instance_type = "t2.micro"
 
   tags = {
-    Name = "${var.prefix_name}-${var.system_name}-devinstance"
+    Name = "${var.prefix_name}-${var.system_name}-${var.stage}-dev"
     Author = var.author
+    Stage = var.stage
   }
 }
