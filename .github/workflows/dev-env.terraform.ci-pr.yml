@@ -21,8 +21,6 @@ env:
 jobs:
   terraform-ut:
     runs-on: ubuntu-latest
-    env:
-      STAGE: prod
     steps:
       - uses: actions/checkout@v2
       - name: Setup terraform
@@ -35,13 +33,15 @@ jobs:
       - name: Run terraform validate
         working-directory: ${{ env.tf_working_dir }}
         run: terraform validate
-      - name: Run terraform plan
+      - name: Switch workspace to prod
+        working-directory: ${{ env.tf_working_dir }}
+        run: terraform workspace select prod
+      - name: Run terraform plan for prod
         working-directory: ${{ env.tf_working_dir }}
         run: terraform plan -var-file vars/prod.tfvars -input=false
+
   terratest:
     runs-on: ubuntu-latest
-    env:
-      STAGE: test
     steps:
       - uses: actions/checkout@v2
       - name: Setup Go
@@ -49,13 +49,13 @@ jobs:
         with:
           go-version: ${{ env.go_version }}
       - name: Download Go Modules
-        working-directory: dev-env/terraform/tests
+        working-directory: ${{ env.tf_working_dir }}/tests
         run: go get -v -d -t ./...
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
       - name: Terraform init
-        working-directory: dev-env/terraform
+        working-directory: ${{ env.tf_working_dir }}
         run: terraform init
       - name: Run Go Tests
-        working-directory: dev-env/terraform/tests
+        working-directory: ${{ env.tf_working_dir }}/tests
         run: go test -v -timeout 30m
