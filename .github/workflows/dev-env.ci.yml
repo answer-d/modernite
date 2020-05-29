@@ -1,0 +1,34 @@
+---
+name: dev-env.ci
+
+on:
+  push:
+    branches:
+      - '*'
+
+env:
+  packer_working_dir: dev-env/packer
+  tf_working_dir: dev-env/terraform
+
+jobs:
+  packer-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Run packer validate
+        working-directory: ${{ env.packer_working_dir }}
+        run: docker run hashicorp/packer:light validate instance.json
+
+  tflint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Run tflint for test
+        working-directory: ${{ env.tf_working_dir }}
+        run: docker run -v `pwd`:/data:ro wata727/tflint:latest --var-file=vars/test.tfvars
+
+      - name: Run tflint for prod
+        working-directory: ${{ env.tf_working_dir }}
+        run: docker run -v `pwd`:/data:ro wata727/tflint:latest --var-file=vars/prod.tfvars

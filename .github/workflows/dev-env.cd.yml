@@ -1,5 +1,5 @@
 ---
-name: dev-env.terraform.cd
+name: dev-env.cd
 
 on:
   release:
@@ -7,6 +7,7 @@ on:
       - published
 
 env:
+  packer_working_dir: dev-env/packer
   tf_version: 0.12.25
   tf_working_dir: dev-env/terraform
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -17,16 +18,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
       - name: Setup terraform
         uses: hashicorp/setup-terraform@v1
         with:
           terraform_version: ${{ env.tf_version }}
+
+      - name: Create AMI
+        working-directory: ${{ env.packer_working_dir }}
+        run: docker run hashicorp/packer:light build -force instance.json
+
       - name: Run terraform init
         working-directory: ${{ env.tf_working_dir }}
         run: terraform init
+
       - name: Switch workspace to prod
         working-directory: ${{ env.tf_working_dir }}
         run: terraform workspace select prod
+
       - name: Run terraform apply for prod
         working-directory: ${{ env.tf_working_dir }}
         run: terraform apply -var-file vars/prod.tfvars -input=false -auto-approve

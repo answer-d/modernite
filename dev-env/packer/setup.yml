@@ -1,0 +1,14 @@
+---
+- name: Create packer image
+  hosts: all
+  become: true
+  tasks:
+    - name: Configure Docker
+      import_role:
+        name: docker
+
+    - name: Configure code-server
+      vars:
+        code_server_url: https://github.com/cdr/code-server/releases/download/v3.3.1/code-server_3.3.1_amd64.deb
+      import_role:
+        name: code_server

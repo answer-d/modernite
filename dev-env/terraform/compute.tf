@@ -1,7 +1,7 @@
 # AmazonLinux2 Latest AMI
 data "aws_ami" "ami_amzn2" {
   most_recent = true
-  owners = ["amazon"]
+  owners = ["self"]
 
   filter {
     name = "architecture"
@@ -13,7 +13,7 @@ data "aws_ami" "ami_amzn2" {
   }
   filter {
     name = "name"
-    values = ["amzn2-ami-hvm-*"]
+    values = ["yama-dev-env*"]
   }
   filter {
     name = "virtualization-type"
@@ -34,7 +34,7 @@ resource "aws_instance" "dev" {
   vpc_security_group_ids = [aws_security_group.public.id]
   subnet_id = aws_subnet.public.id
   key_name = var.key_name
-  instance_type = "t2.micro"
+  instance_type = var.dev_instance_type
 
   tags = {
     Name = "${var.prefix_name}-${var.system_name}-${var.stage}-dev"
