@@ -18,7 +18,7 @@ jobs:
 
       - name: Run packer validate
         working-directory: ${{ env.packer_working_dir }}
-        run: docker run hashicorp/packer:light validate instance.json
+        run: docker run -v `pwd`:/mnt --workdir /mnt hashicorp/packer:light validate /mnt/instance.json
 
   tflint:
     runs-on: ubuntu-latest
