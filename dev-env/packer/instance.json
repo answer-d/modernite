@@ -1,0 +1,52 @@
+{
+  "builders": [
+    {
+      "type": "amazon-ebs",
+      "source_ami_filter": {
+        "filters": {
+          "virtualization-type": "hvm",
+          "name": "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*",
+          "root-device-type": "ebs"
+        },
+        "owners": ["099720109477"],
+        "most_recent": true
+      },
+      "instance_type": "t2.micro",
+      "ssh_username": "ubuntu",
+      "ami_name": "yama-dev-env",
+      "tags" : {
+        "Name": "yama-dev-env",
+        "Author": "yamaguti-dxa",
+        "Timestamp": "{{ timestamp }}"
+      }
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "/usr/bin/cloud-init status --wait",
+        "sudo apt update",
+        "sudo DEBIAN_FRONTEND=noninteractive --preserve-env apt upgrade -y",
+        "sudo apt install python3 python3-pip python3-setuptools -y",
+        "sudo apt autoremove -y",
+        "sudo pip3 install ansible"
+      ]
+    },
+    {
+      "type": "ansible-local",
+      "playbook_file": "setup.yml",
+      "role_paths": [
+        "roles/docker",
+        "roles/code_server"
+      ],
+      "staging_directory": "/tmp/ansible-local",
+      "extra_arguments": "-e \"ansible_python_interpreter=/usr/bin/python3\" -v"
+    },
+    {
+      "type": "ansible-local",
+      "playbook_file": "tests/main.yml",
+      "extra_arguments": "-e \"ansible_python_interpreter=/usr/bin/python3\" -v"
+    }
+  ]
+}

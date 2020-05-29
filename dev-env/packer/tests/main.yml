@@ -1,0 +1,15 @@
+---
+- name: Test packer image
+  hosts: localhost
+  become: true
+  tasks:
+    - name: Docker container creation test
+      docker_container:
+        name: test-container
+        image: hello-world:latest
+      register: result_container_creation
+      failed_when: result_container_creation.container.State.Status != "running"
+
+    - name: Check port 8080 listening (code-server)
+      wait_for:
+        port: 8080

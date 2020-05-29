@@ -29,3 +29,7 @@ variable "key_name" {
 variable "teams_webhook_url_ssm_name" {
   description = "SSM Parameter to which teams webhook url is set (pre-determined)"
 }
+
+variable "dev_instance_type" {
+  description = "instance size for development instance"
+}
