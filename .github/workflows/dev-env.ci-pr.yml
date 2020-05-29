@@ -64,6 +64,7 @@ jobs:
         working-directory: ${{ env.tf_working_dir }}
         run: terraform init
 
+      # テストにもPackerから作成されたAMIが必要なので、本当はPackerリポとTerraformリポは分けた方が良い
       - name: Run Go Tests
         working-directory: ${{ env.tf_working_dir }}/tests
         run: go test -v -timeout 30m
