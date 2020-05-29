@@ -26,7 +26,7 @@ jobs:
 
       - name: Create AMI
         working-directory: ${{ env.packer_working_dir }}
-        run: docker run -v `pwd`:/mnt --workdir /mnt -e AWS_ACCESS_KEY_ID=${{ AWS_ACCESS_KEY_ID }} -e AWS_SECRET_ACCESS_KEY=${{AWS_SECRET_ACCESS_KEY}} hashicorp/packer:light build -force /mnt/instance.json
+        run: docker run -v `pwd`:/mnt --workdir /mnt -e AWS_ACCESS_KEY_ID=${{ env.AWS_ACCESS_KEY_ID }} -e AWS_SECRET_ACCESS_KEY=${{ env.AWS_SECRET_ACCESS_KEY }} hashicorp/packer:light build -force /mnt/instance.json
 
       - name: Run terraform init
         working-directory: ${{ env.tf_working_dir }}
