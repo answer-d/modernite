@@ -19,6 +19,9 @@ env:
 jobs:
   terraform-ut:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ env.tf_working_dir }}
     steps:
       - uses: actions/checkout@v2
 
@@ -28,19 +31,15 @@ jobs:
           terraform_version: ${{ env.tf_version }}
 
       - name: Run terraform init
-        working-directory: ${{ env.tf_working_dir }}
         run: terraform init
 
       - name: Run terraform validate
-        working-directory: ${{ env.tf_working_dir }}
         run: terraform validate
 
       - name: Switch workspace to prod
-        working-directory: ${{ env.tf_working_dir }}
         run: terraform workspace select prod
 
       - name: Run terraform plan for prod
-        working-directory: ${{ env.tf_working_dir }}
         run: terraform plan -var-file vars/prod.tfvars -input=false
 
   terratest:
