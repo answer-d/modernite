@@ -22,13 +22,14 @@ jobs:
 
   tflint:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ env.tf_working_dir }}
     steps:
       - uses: actions/checkout@v2
 
       - name: Run tflint for test
-        working-directory: ${{ env.tf_working_dir }}
         run: docker run -v `pwd`:/data:ro wata727/tflint:latest --var-file=vars/test.tfvars
 
       - name: Run tflint for prod
-        working-directory: ${{ env.tf_working_dir }}
         run: docker run -v `pwd`:/data:ro wata727/tflint:latest --var-file=vars/prod.tfvars
